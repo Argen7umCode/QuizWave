@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+
+  web:
+    build: ./project
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    volumes:
+      - ./project:/usr/src/app
+    ports:
+      - 8004:8000
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5430/foo
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16.0-alpine
+    environment:
+      POSTGRES_DB: "fast_api_lesson"
+      POSTGRES_USER: "argen7um"
+      POSTGRES_PASSWORD: "pass"
+    ports:
+      - "5430:5432"
