@@ -12,13 +12,13 @@ class AnswerQuestionLink(SQLModel, table=True):
 
 class Question(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
-    question_text: str
+    text: str
 
     questions: List['Answer'] = Relationship(back_populates='questions', link_model=AnswerQuestionLink)
 
 class Answer(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
-    answer_text: str
+    text: str
 
     questions: List[Question] = Relationship(back_populates='questions', link_model=AnswerQuestionLink)
 
