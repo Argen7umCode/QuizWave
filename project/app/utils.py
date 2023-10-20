@@ -125,12 +125,8 @@ class GetterCreator(Getter, Creator):
                                          text: str, 
                                          session: AsyncSession):
         item = (await self.get_by_text(text, session))
-        if item == []:
-            print('true')
-            return (await self.create(text, session))
-        else: 
-            print('false')
-            return item[0][0]
+        return (await self.create(text, session)) if item == [] else item[0][0]
+
 
 class AnswerGetterCreator(AnswerGetter, AnswerCreator, GetterCreator):
     pass
@@ -159,10 +155,6 @@ async def get_blocks_until_is_not_unique(num: int, session: AsyncSession):
                                 session=session):
             answer = (await AnswerGetterCreator().get_or_create_if_not_exist(quiz_block.answer, session))
             question = (await QuestionGetterCreator().get_or_create_if_not_exist(quiz_block.question, session))
-            print()
-            print(answer)
-            print(question)
-            print()
             answer_question_link = await AnswerQuestionLinkCreator.create(answer, question, session)
         else:
             counter += 1
@@ -183,7 +175,6 @@ async def get_block_from_db(id: int, session: AsyncSession):
 async def get_blocks_from_db(num: int, session: AsyncSession):
     max_id = (await session.execute(select(func.max(AnswerQuestionLink.id)))).one()[0]
     ids = [choice(range(max_id+1)) for _ in range(num)]
-    print(ids)
     query = select(Answer.text, Question.text, AnswerQuestionLink.created)\
                         .join(Answer).join(Question)\
                         .where(AnswerQuestionLink.id.in_(ids))
