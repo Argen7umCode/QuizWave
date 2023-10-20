@@ -43,36 +43,33 @@ class AnswerGetter(Getter):
 
 
 class Creator:
-    pass
+
+    @staticmethod
+    async def create(item: Any, session: AsyncSession):
+        session.add(item)
+        await session.commit()
+        return item
 
 class AnswerCreator(Creator):
     @staticmethod
     async def create(text: str, session: AsyncSession):
         answer = Answer(answer_text=text)
-        with session as sess:
-            await sess.add(answer)
-            await sess.commit()
-        return answer
-
+        return await Creator.create(answer, session)
+    
 class QuestionCreator(Creator):
     @staticmethod
     async def create(text: str, session: AsyncSession):
         question = Question(question_text=text)
-        with session as sess:
-            await sess.add(question)
-            await sess.commit()
-        return question
+        return await Creator.create(question, session)
+    
 
 class AnswerQuestionLinkCreator(Creator):
     @staticmethod
     async def create(answer: Answer, question: Question, session: AsyncSession):
-        answ_quest_link = AnswerQuestionLink(question_id=question.id,
-                                             answer_id=answer.id,
+        answ_quest_link = AnswerQuestionLink(answer_id=answer.id,
+                                             question_id=question.id,
                                              created=datetime.now())
-        with session as sess:
-            await sess.add(answ_quest_link)
-            await sess.commit()
-        return answ_quest_link
+        return await Creator.create(answ_quest_link, session)
 
 
 class GetterCreator(Getter, Creator):
@@ -80,7 +77,7 @@ class GetterCreator(Getter, Creator):
     async def get_or_create_if_not_exist(self, text, session: AsyncSession):
         item = await self.get_by_text(text, session)
         if item is None:
-            item = self.create(text, session)
+            item = await self.create(text, session)
         return item
 
 class AnswerGetterCreator(AnswerGetter, AnswerCreator, GetterCreator):
@@ -113,9 +110,9 @@ async def get_blocks_until_is_not_unique(num: int, session: AsyncSession):
         quiz_block=QuizBlockFromJSerivice(**block)
         if await is_quize_block_unique(quiz_block=quiz_block,
                                 session=session):
-            answer, question = [await instance.get_or_create_if_not_exist(text, session)
-                                for instance, text in zip((AnswerGetterCreator(), QuestionGetterCreator()),
-                                                           (quiz_block.answer, quiz_block.question))]
+            answer = await AnswerGetterCreator().get_or_create_if_not_exist(quiz_block.answer, session)
+            question = await QuestionGetterCreator().get_or_create_if_not_exist(quiz_block.question, session)
+            print(type(answer))
             answer_question_link = await AnswerQuestionLinkCreator.create(answer, question, session)
         else:
             counter += 1
