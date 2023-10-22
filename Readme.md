@@ -24,41 +24,39 @@ QuizMaster is a web service for hosting and managing quizzes. It allows you to c
 4. **Recommended Technologies:**
    - It's recommended to use docker-compose for managing containers, SQLAlchemy for interacting with the database, and type annotations for code readability.
 
-## Project Timeline
-
+Project Timeline
 The project should be completed by 23.10.2023.
 
-## Getting Started
-
+Getting Started
 Follow these steps to get started with QuizMaster:
 
-### Prerequisites
+Prerequisites
+Docker
+Python 3.10
+Your favorite code editor
+Building and Running the Service
+Clone this repository to your local machine.
 
-- Docker
-- Python 3.10
-- Your favorite code editor
+Navigate to the project directory.
 
-### Building and Running the Service
+Build the Docker image for the service:
 
-1. Clone this repository to your local machine.
+Copy code
+docker build -t quizmaster-service .
+Start the Docker containers:
 
-2. Navigate to the project directory.
+Copy code
+docker-compose up -d
+The service will be accessible at http://localhost:8000.
 
-3. Build the Docker image for the service:
+Example API Request
+To retrieve a random quiz question, send a POST request to http://localhost:8000/api/question with the following JSON data:
 
-4. Start the Docker containers:
-
-5. The service will be accessible at `http://localhost:8000`.
-
-### Example API Request
-
-To retrieve a random quiz question, send a POST request to `http://localhost:8000/api/question` with the following JSON data:
-
-```json
+json
+Copy code
 {
-"questions_num": 1
+  "questions_num": 1
 }
-```
-
-### Contributors
+Contributors
+Artur Shatyrin (Argen7um)
 - Artur Shatyrin (Argen7um)
